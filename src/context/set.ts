@@ -16,7 +16,7 @@ export type ForbiddenHeaderNames =
   | 'set-cookie2'
 
 export type ForbiddenHeaderError<HeaderName extends string> =
-  `SafeResponseHeader: the '${HeaderName}' header cannot be set on the response. Please use the 'ctx.cookie()' function instead.`
+  `SafeResponseHeader: the header cannot be set on the response. Please use the 'ctx.cookie()' function instead.`
 
 /**
  * Sets one or multiple response headers.

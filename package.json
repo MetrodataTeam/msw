@@ -1,6 +1,6 @@
 {
   "name": "msw-ts3",
-  "version": "0.35.0-beta",
+  "version": "0.35.0-theta",
   "description": "Seamless REST/GraphQL API mocking library for browser and Node.js.",
   "main": "lib/umd/index.js",
   "module": "lib/esm/index.js",
