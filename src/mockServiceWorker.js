@@ -172,7 +172,25 @@ async function getResponse(event, client, requestId) {
 
   // Send the request to the client-side MSW.
   const reqHeaders = serializeHeaders(request.headers)
-  const body = await request.text()
+  const contentType = request.headers.get('Content-Type')
+  let body
+  if (
+    contentType &&
+    (contentType.includes('image') ||
+      contentType.includes('video') ||
+      contentType.includes('application')) &&
+    !contentType.includes('application/json')
+  ) {
+    const buffer = new Uint8Array(await request.arrayBuffer())
+    let binary = ''
+    const len = buffer.byteLength
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(buffer[i])
+    }
+    body = binary
+  } else {
+    body = await request.text()
+  }
 
   const clientMessage = await sendToClient(client, {
     type: 'REQUEST',
@@ -241,6 +259,22 @@ This exception has been gracefully handled as a 500 response, however, it's stro
 self.addEventListener('fetch', function (event) {
   const { request } = event
   const accept = request.headers.get('accept') || ''
+
+  if (request.url.includes('mockRedirect.html')) {
+    const search = request.url.split('?')[1]
+    // console.log('search:', search)
+    const getQuerys = (search) => {
+      const arr = search.split('&')
+      const map = {}
+      arr.forEach((e) => {
+        const [key, val] = e.split('=')
+        map[key] = val
+      })
+      return map
+    }
+    const href = decodeURIComponent(getQuerys(search).href)
+    return event.respondWith(fetch(href))
+  }
 
   // Bypass server-sent events.
   if (accept.includes('text/event-stream')) {
