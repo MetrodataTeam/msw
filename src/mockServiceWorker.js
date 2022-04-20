@@ -173,8 +173,33 @@ async function getResponse(event, client, requestId) {
   // Send the request to the client-side MSW.
   const reqHeaders = serializeHeaders(request.headers)
   const contentType = request.headers.get('Content-Type')
+  // 尝试获取文件名
+  const fileName = new URL(request.url).pathname.split('/').at(-1);
+  const suffix = fileName?.split('.').at(-1)?.toLowerCase();
+  const isBinary = suffix && [
+    // image
+    'jpg',
+    'jpeg',
+    'png',
+    'bmp',
+    'webp',
+    'ico',
+    'gif',
+    // audio & video
+    'mp3',
+    'aac',
+    'flac',
+    'wav',
+    'ape',
+    'ogg',
+    'mp4',
+    'avi',
+    'webm',
+  ].includes(suffix);
+
   let body
   if (
+    isBinary ||
     contentType &&
     (contentType.includes('image') ||
       contentType.includes('video') ||
